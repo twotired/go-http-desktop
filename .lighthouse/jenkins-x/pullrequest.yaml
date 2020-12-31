@@ -8,32 +8,40 @@ spec:
   pipelineSpec:
     tasks:
     - name: from-build-pack
-      resources: {}
+      resources:
+        requests:
+          cpu: 1
       taskSpec:
         metadata: {}
         stepTemplate:
           name: ""
           resources:
             requests:
-              cpu: 400m
+              cpu: 1
               memory: 600Mi
           workingDir: /workspace/source
         steps:
         - image: gcr.io/jenkinsxio/jx-boot:3.1.77
           name: jx-variables
-          resources: {}
+          resources:
+            requests:
+              cpu: 1
           script: |
             #!/usr/bin/env sh
             jx gitops variables
         - image: gcr.io/jenkinsxio/builder-go:2.1.150-769
           name: build-make-linux
-          resources: {}
+          resources:
+            requests:
+              cpu: 1
           script: |
             #!/bin/sh
             make linux
         - image: gcr.io/kaniko-project/executor:debug-v1.3.0
           name: build-container-build
-          resources: {}
+          resources:
+            requests:
+              cpu: 1
           script: |
             #!/busybox/sh
             source .jx/variables.sh
@@ -41,7 +49,9 @@ spec:
             /kaniko/executor $KANIKO_FLAGS --context=/workspace/source --dockerfile=/workspace/source/Dockerfile --destination=$DOCKER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
         - image: gcr.io/jenkinsxio/jx-preview:0.0.137
           name: promote-jx-preview
-          resources: {}
+          resources:
+            requests:
+              cpu: 1
           script: |
             #!/usr/bin/env sh
             source /workspace/source/.jx/variables.sh
